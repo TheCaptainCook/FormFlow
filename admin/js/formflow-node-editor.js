@@ -119,7 +119,6 @@
                         ${ hasCondIn ? '<div class="formflow-port port-left" data-port-type="cond-in" title="Conditional Input"></div>' : ''}
                         <div class="formflow-node-header">
                             <span class="formflow-node-title">${node.type.toUpperCase()}</span>
-                            ${node.type !== 'submitButton' ? `<span class="dashicons dashicons-trash formflow-node-delete" style="cursor:pointer; color:#ef4444; margin-left:auto;" title="Delete Node"></span>` : ''}
                         </div>
                         <div class="formflow-node-body" style="display: ${node.minimized ? 'none' : 'block'};">
                             ${fieldsHtml}
