@@ -52,6 +52,18 @@ abstract class FormFlow_Node {
     abstract public function get_js_config();
 
     /**
+     * Determines whether this node renders visible HTML on the frontend form.
+     * Nodes that only apply logic (validation, spam, logic, etc.) should return false.
+     * Input/Field nodes and the submit button return true.
+     *
+     * @return bool
+     */
+    public function is_visual() {
+        return true;
+    }
+
+
+    /**
      * Checks if the current user has access to this node based on their Freemius plan.
      *
      * @return bool
@@ -104,6 +116,7 @@ abstract class FormFlow_Node {
             'category'      => $this->get_category(),
             'tier'          => $this->get_tier(),
             'is_accessible' => $this->is_accessible(),
+            'is_visual'     => $this->is_visual(),
             'config'        => $this->get_js_config(),
         );
     }

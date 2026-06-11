@@ -27,6 +27,8 @@ class FormFlow_Node_Validate_Match extends FormFlow_Node {
         return 'pro';
     }
 
+    public function is_visual() { return false; }
+
     public function get_js_config() {
         return array(
             'inputs'  => array( 'cond-in' ),

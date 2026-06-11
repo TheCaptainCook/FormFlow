@@ -6,9 +6,17 @@
 $nodes = $form_data['nodes'];
 $edges = $form_data['edges'];
 
-// Separate submit buttons and input nodes
+// Separate submit buttons and input nodes; exclude non-visual nodes (validation, logic, spam etc.)
+$registered_nodes = FormFlow_Node_Registry::get_instance()->get_frontend_nodes();
 $submit_nodes = array_filter($nodes, function($n) { return $n['type'] === 'submitButton'; });
-$input_nodes = array_filter($nodes, function($n) { return $n['type'] !== 'submit' && $n['type'] !== 'submitButton'; });
+$input_nodes  = array_filter($nodes, function($n) use ($registered_nodes) {
+    if ( $n['type'] === 'submit' || $n['type'] === 'submitButton' ) return false;
+    // Exclude if the node definition marks it as non-visual
+    if ( isset( $registered_nodes[ $n['type'] ] ) && isset( $registered_nodes[ $n['type'] ]['is_visual'] ) ) {
+        return (bool) $registered_nodes[ $n['type'] ]['is_visual'];
+    }
+    return true; // default: visual
+});
 
 // Filter out disconnected nodes
 $connected_ids = array();

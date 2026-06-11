@@ -27,6 +27,8 @@ class FormFlow_Node_Validate_Credit_Card extends FormFlow_Node {
         return 'lifetime';
     }
 
+    public function is_visual() { return false; }
+
     public function get_js_config() {
         return array(
             'inputs'  => array( 'cond-in' ),
