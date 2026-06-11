@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Min Value
+ * Ensures a number is greater than or equal to X.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Min_Value extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Min_Value extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Minimum Value';
+        return 'Min Value';
     }
 
     public function get_description() {
-        return 'Ensures a number is greater than or equal to a value.';
+        return 'Ensures a number is greater than or equal to X.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Min_Value extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'minValue',
-                    'label' => 'Minimum Value',
-                    'type' => 'number',
-                    'default' => 0,
-                ),
+                array( 'name' => 'min',           'label' => 'Minimum Value', 'type' => 'number', 'default' => 0 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text',   'default' => 'Value must be at least {min}.' ),
             )
         );
     }

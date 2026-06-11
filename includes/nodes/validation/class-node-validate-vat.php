@@ -1,7 +1,11 @@
 <?php
+/**
+ * Node: Validate VAT
+ * Checks European VAT number format.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class FormFlow_Node_Validate_Vat extends FormFlow_Node {
+class FormFlow_Node_Validate_VAT extends FormFlow_Node {
 
     public function get_id() {
         return 'validateVAT';
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Vat extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Validates European VAT numbers.';
+        return 'Checks European VAT number format.';
     }
 
     public function get_category() {
@@ -25,9 +29,11 @@ class FormFlow_Node_Validate_Vat extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
-            'fields'  => array()
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
+            'fields'  => array(
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text', 'default' => 'Please enter a valid VAT number.' ),
+            )
         );
     }
 }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Unique
+ * Checks if a value already exists in the database.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Unique extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Unique extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Unique Database';
+        return 'Unique Value';
     }
 
     public function get_description() {
-        return 'Ensures a value does not already exist in the database.';
+        return 'Checks if a value already exists in the database.';
     }
 
     public function get_category() {
@@ -25,21 +29,12 @@ class FormFlow_Node_Validate_Unique extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'dbTable',
-                    'label' => 'Table Name',
-                    'type' => 'text',
-                    'placeholder' => 'wp_users',
-                ),
-                array(
-                    'name' => 'dbColumn',
-                    'label' => 'Column Name',
-                    'type' => 'text',
-                    'placeholder' => 'user_email',
-                ),
+                array( 'name' => 'db_table',      'label' => 'DB Table',      'type' => 'text', 'default' => 'wp_users' ),
+                array( 'name' => 'db_column',     'label' => 'DB Column',     'type' => 'text', 'default' => 'user_email' ),
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text', 'default' => 'This value is already taken.' ),
             )
         );
     }

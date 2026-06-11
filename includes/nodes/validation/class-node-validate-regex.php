@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Regex
+ * Checks input against a custom regular expression.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Regex extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Regex extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Custom Regex';
+        return 'Regex Pattern';
     }
 
     public function get_description() {
-        return 'Validates input against a custom Regular Expression.';
+        return 'Checks input against a custom regular expression.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Regex extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'pattern',
-                    'label' => 'Regex Pattern',
-                    'type' => 'text',
-                    'placeholder' => '^[a-z]+$',
-                ),
+                array( 'name' => 'pattern',       'label' => 'Regex Pattern',   'type' => 'text', 'default' => '^[a-zA-Z]+$' ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',   'type' => 'text', 'default' => 'Invalid format.' ),
             )
         );
     }

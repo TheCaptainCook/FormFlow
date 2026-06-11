@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Max Value
+ * Ensures a number is less than or equal to X.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Max_Value extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Max_Value extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Maximum Value';
+        return 'Max Value';
     }
 
     public function get_description() {
-        return 'Ensures a number is less than or equal to a value.';
+        return 'Ensures a number is less than or equal to X.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Max_Value extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'maxValue',
-                    'label' => 'Maximum Value',
-                    'type' => 'number',
-                    'default' => 100,
-                ),
+                array( 'name' => 'max',           'label' => 'Maximum Value', 'type' => 'number', 'default' => 100 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text',   'default' => 'Value must be no more than {max}.' ),
             )
         );
     }

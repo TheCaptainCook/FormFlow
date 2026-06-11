@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Email
+ * Checks if the input matches email@domain.com format.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Email extends FormFlow_Node {
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Email extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Validates standard email format.';
+        return 'Checks if the input matches email@domain.com format.';
     }
 
     public function get_category() {
@@ -25,9 +29,11 @@ class FormFlow_Node_Validate_Email extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
-            'fields'  => array()
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
+            'fields'  => array(
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text', 'default' => 'Please enter a valid email address.' ),
+            )
         );
     }
 }

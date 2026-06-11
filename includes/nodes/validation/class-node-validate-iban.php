@@ -1,7 +1,11 @@
 <?php
+/**
+ * Node: Validate IBAN
+ * Checks international bank account number format.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class FormFlow_Node_Validate_Iban extends FormFlow_Node {
+class FormFlow_Node_Validate_IBAN extends FormFlow_Node {
 
     public function get_id() {
         return 'validateIBAN';
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Iban extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Validates International Bank Account Numbers.';
+        return 'Checks international bank account number format.';
     }
 
     public function get_category() {
@@ -25,9 +29,11 @@ class FormFlow_Node_Validate_Iban extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
-            'fields'  => array()
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
+            'fields'  => array(
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text', 'default' => 'Please enter a valid IBAN.' ),
+            )
         );
     }
 }

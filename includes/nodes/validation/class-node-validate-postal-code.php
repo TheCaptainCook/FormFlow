@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Postal Code
+ * Checks format against country-specific postal codes.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Postal_Code extends FormFlow_Node {
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Postal_Code extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Validates international postal code formats.';
+        return 'Checks format against country-specific postal codes.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Postal_Code extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'countryCode',
-                    'label' => 'Country Code',
-                    'type' => 'text',
-                    'placeholder' => 'US',
-                ),
+                array( 'name' => 'country',       'label' => 'Country Code (e.g. US, GB, DE)', 'type' => 'text', 'default' => 'US' ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',                   'type' => 'text', 'default' => 'Please enter a valid postal code.' ),
             )
         );
     }

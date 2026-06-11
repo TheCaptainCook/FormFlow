@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Match
+ * Checks if two fields have identical values (e.g., password confirmation).
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Match extends FormFlow_Node {
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Match extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Ensures two fields match (e.g. Password Confirmation).';
+        return 'Checks if two fields have identical values (e.g., password confirmation).';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Match extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'matchTargetId',
-                    'label' => 'Target Field ID',
-                    'type' => 'text',
-                    'placeholder' => 'node_12345',
-                ),
+                array( 'name' => 'match_target_id', 'label' => 'Target Field Node ID', 'type' => 'text',   'default' => '' ),
+                array( 'name' => 'error_message',   'label' => 'Error Message',         'type' => 'text',   'default' => 'Fields do not match.' ),
             )
         );
     }

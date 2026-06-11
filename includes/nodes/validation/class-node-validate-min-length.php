@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Min Length
+ * Ensures text is longer than X characters.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Min_Length extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Min_Length extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Minimum Length';
+        return 'Min Length';
     }
 
     public function get_description() {
-        return 'Ensures a string meets a minimum character count.';
+        return 'Ensures text is longer than X characters.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Min_Length extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'minLength',
-                    'label' => 'Min Characters',
-                    'type' => 'number',
-                    'default' => 3,
-                ),
+                array( 'name' => 'min',           'label' => 'Min Characters', 'type' => 'number', 'default' => 3 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',  'type' => 'text',   'default' => 'Must be at least {min} characters.' ),
             )
         );
     }

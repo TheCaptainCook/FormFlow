@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Age
+ * Ensures the user is at least X years old based on a date field.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Age extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Age extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Minimum Age';
+        return 'Min Age';
     }
 
     public function get_description() {
-        return 'Validates a user is over a certain age.';
+        return 'Ensures the user is at least X years old based on a date field.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Age extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'minAge',
-                    'label' => 'Minimum Age',
-                    'type' => 'number',
-                    'default' => 18,
-                ),
+                array( 'name' => 'min_age',       'label' => 'Minimum Age (years)', 'type' => 'number', 'default' => 18 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',        'type' => 'text',   'default' => 'You must be at least {min_age} years old.' ),
             )
         );
     }

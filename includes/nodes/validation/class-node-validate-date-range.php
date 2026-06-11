@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Date Range
+ * Ensures a date falls between two others.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Date_Range extends FormFlow_Node {
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_Date_Range extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Ensures a date falls within a specific range.';
+        return 'Ensures a date falls between two others.';
     }
 
     public function get_category() {
@@ -25,21 +29,12 @@ class FormFlow_Node_Validate_Date_Range extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'minDate',
-                    'label' => 'Min Date',
-                    'type' => 'text',
-                    'placeholder' => 'YYYY-MM-DD',
-                ),
-                array(
-                    'name' => 'maxDate',
-                    'label' => 'Max Date',
-                    'type' => 'text',
-                    'placeholder' => 'YYYY-MM-DD',
-                ),
+                array( 'name' => 'min_date',      'label' => 'Min Date (YYYY-MM-DD)', 'type' => 'text', 'default' => '' ),
+                array( 'name' => 'max_date',      'label' => 'Max Date (YYYY-MM-DD)', 'type' => 'text', 'default' => '' ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',          'type' => 'text', 'default' => 'Date must be between {min_date} and {max_date}.' ),
             )
         );
     }

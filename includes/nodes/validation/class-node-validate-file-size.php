@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate File Size
+ * Restricts uploaded file size (e.g., max 5MB).
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_File_Size extends FormFlow_Node {
@@ -12,7 +16,7 @@ class FormFlow_Node_Validate_File_Size extends FormFlow_Node {
     }
 
     public function get_description() {
-        return 'Restricts uploaded files to a maximum MB size.';
+        return 'Restricts uploaded file size (e.g., max 5MB).';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_File_Size extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'maxMb',
-                    'label' => 'Max Size (MB)',
-                    'type' => 'number',
-                    'default' => 5,
-                ),
+                array( 'name' => 'max_size_mb',   'label' => 'Max Size (MB)', 'type' => 'number', 'default' => 5 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message', 'type' => 'text',   'default' => 'File exceeds the maximum allowed size of {max_size_mb}MB.' ),
             )
         );
     }

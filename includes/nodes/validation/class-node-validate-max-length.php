@@ -1,4 +1,8 @@
 <?php
+/**
+ * Node: Validate Max Length
+ * Ensures text is shorter than X characters.
+ */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FormFlow_Node_Validate_Max_Length extends FormFlow_Node {
@@ -8,11 +12,11 @@ class FormFlow_Node_Validate_Max_Length extends FormFlow_Node {
     }
 
     public function get_name() {
-        return 'Maximum Length';
+        return 'Max Length';
     }
 
     public function get_description() {
-        return 'Ensures a string does not exceed a character count.';
+        return 'Ensures text is shorter than X characters.';
     }
 
     public function get_category() {
@@ -25,15 +29,11 @@ class FormFlow_Node_Validate_Max_Length extends FormFlow_Node {
 
     public function get_js_config() {
         return array(
-            'inputs'  => array(),
-            'outputs' => array(),
+            'inputs'  => array( 'cond-in' ),
+            'outputs' => array( 'cond-out' ),
             'fields'  => array(
-                array(
-                    'name' => 'maxLength',
-                    'label' => 'Max Characters',
-                    'type' => 'number',
-                    'default' => 255,
-                ),
+                array( 'name' => 'max',           'label' => 'Max Characters', 'type' => 'number', 'default' => 255 ),
+                array( 'name' => 'error_message', 'label' => 'Error Message',  'type' => 'text',   'default' => 'Must be no more than {max} characters.' ),
             )
         );
     }
