@@ -119,6 +119,7 @@
                         ${ hasCondIn ? '<div class="formflow-port port-left" data-port-type="cond-in" title="Conditional Input"></div>' : ''}
                         <div class="formflow-node-header">
                             <span class="formflow-node-title">${node.type.toUpperCase()}</span>
+                            ${node.type !== 'submitButton' ? `<span class="dashicons dashicons-trash formflow-node-delete" style="cursor:pointer; color:#ef4444; margin-left:auto;" title="Delete Node"></span>` : ''}
                         </div>
                         <div class="formflow-node-body" style="display: ${node.minimized ? 'none' : 'block'};">
                             ${fieldsHtml}
@@ -667,6 +668,23 @@
                     drawEdge(edge.from, edge.to, edge.fromPort, edge.toPort);
                 });
                 updateDataInput();
+            }
+        });
+
+        // Keyboard support for deleting nodes
+        $(document).on('keydown', function(e) {
+            // Check if we are not typing inside an input or textarea
+            if ($(e.target).is('input, textarea, select')) return;
+            
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedNodeId) {
+                let nodeObj = nodes.find(n => n.id === selectedNodeId);
+                if (nodeObj && nodeObj.type === 'submitButton') return;
+                
+                nodes = nodes.filter(n => n.id !== selectedNodeId);
+                edges = edges.filter(e => e.from !== selectedNodeId && e.to !== selectedNodeId);
+                selectedNodeId = null;
+                $('#formflow-delete-node-btn').prop('disabled', true);
+                renderGraph();
             }
         });
 
