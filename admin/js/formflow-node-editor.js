@@ -452,7 +452,6 @@
                 x: ((e.clientX - container.offset().left) - panX) / currentZoom - draggingNode.position().left,
                 y: ((e.clientY - container.offset().top + $(window).scrollTop()) - panY) / currentZoom - draggingNode.position().top
             };
-            e.stopPropagation();
         });
 
         // Dynamic Fields Update
