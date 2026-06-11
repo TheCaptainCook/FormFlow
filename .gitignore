@@ -1,0 +1,9 @@
+# Local dev docs — kept locally, excluded from GitHub
+docs/
+
+# PowerShell scratch scripts
+*.ps1
+
+# OS files
+.DS_Store
+Thumbs.db
