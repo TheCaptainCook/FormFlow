@@ -1,0 +1,363 @@
+#formflow-editor-wrapper {
+    margin-top: 15px;
+}
+
+.formflow-toolbar {
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+
+.formflow-node {
+    position: absolute;
+    min-width: 200px;
+    width: auto;
+    max-width: 400px;
+    background: #fff;
+    border: 2px solid #007cba;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: move;
+    user-select: none;
+    resize: horizontal;
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.formflow-node.selected {
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.4), 0 4px 15px rgba(0,0,0,0.2);
+    border-color: #005a87;
+    z-index: 100;
+}
+
+.formflow-node-header {
+    background: #007cba;
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 12px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.formflow-node-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.formflow-node-delete, .formflow-node-toggle {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1;
+}
+
+.formflow-node-delete:hover, .formflow-node-toggle:hover {
+    color: #fff;
+}
+
+.formflow-node-delete:hover {
+    color: #ff4444;
+}
+
+.formflow-node-body {
+    padding: 6px 8px;
+}
+
+.formflow-node-body input[type="text"],
+.formflow-node-body input[type="number"],
+.formflow-node-body textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 1px;
+    margin-bottom: 4px;
+    font-size: 10px;
+    padding: 1px 3px;
+    min-height: 18px;
+}
+
+.formflow-node-body input[type="checkbox"] {
+    margin-left: 5px;
+    margin-top: 2px;
+}
+
+.formflow-dynamic-field {
+    margin-bottom: 2px;
+}
+
+.formflow-dynamic-field label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #444;
+}
+
+.formflow-port {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    border-radius: 50%;
+    position: absolute;
+    cursor: crosshair;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+    z-index: 5;
+}
+
+.formflow-port:hover {
+    background: #ff4444 !important;
+}
+
+/* Data Ports (Left/Right) */
+.formflow-port.port-left {
+    background: #007cba;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.formflow-port.port-left:hover {
+    transform: translateY(-50%) scale(1.4) !important;
+}
+
+.formflow-port.port-right {
+    background: #007cba;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.formflow-port.port-right:hover {
+    transform: translateY(-50%) scale(1.4) !important;
+}
+
+/* Conditional Logic Ports (Top/Bottom) */
+.formflow-port.port-top {
+    background: #e68e00;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.formflow-port.port-top:hover {
+    transform: translateX(-50%) scale(1.4) !important;
+}
+
+.formflow-port.port-bottom {
+    background: #e68e00;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.formflow-port.port-bottom:hover {
+    transform: translateX(-50%) scale(1.4) !important;
+}
+
+path.connection-hitbox {
+    stroke: transparent;
+    stroke-width: 15;
+    fill: none;
+    cursor: pointer;
+    pointer-events: stroke;
+}
+
+path.connection {
+    stroke: #555;
+    stroke-width: 2;
+    fill: none;
+    pointer-events: none;
+    transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+path.connection.hovered {
+    stroke: #ff4444;
+    stroke-width: 3;
+}
+
+.formflow-edge-delete {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 10;
+}
+
+.formflow-edge-delete.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.formflow-edge-delete .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Add Node Modal */
+.formflow-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formflow-modal-content {
+    background: #fff;
+    width: 80%;
+    max-width: 1200px;
+    height: 80%;
+    max-height: 600px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.formflow-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.formflow-modal-header h2 { margin: 0; }
+.formflow-modal-close { cursor: pointer; font-size: 24px; line-height: 1; }
+
+.formflow-modal-body {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#formflow-node-search {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.formflow-tier-section {
+    margin-bottom: 30px;
+}
+
+.formflow-sticky-header {
+    position: sticky;
+    top: -20px;
+    background: #fff;
+    z-index: 10;
+    padding: 15px 20px 10px 20px;
+    margin: 0 -20px 15px -20px;
+    border-bottom: 1px solid #eaeaea;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tier-label-free {
+    color: #fff;
+    background: #4CAF50;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.tier-label-pro {
+    color: #fff;
+    background: #007cba;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.tier-label-business {
+    color: #fff;
+    background: #e68e00;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.tier-label-lifetime {
+    color: #fff;
+    background: #9b59b6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.formflow-node-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.formflow-node-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+    position: relative;
+}
+
+.formflow-node-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.formflow-node-card.locked:hover {
+    border-color: #ddd;
+    box-shadow: none;
+}
+
+.formflow-node-card:not(.locked):hover {
+    border-color: #007cba;
+    box-shadow: 0 2px 8px rgba(0,124,186,0.2);
+}
+
+.formflow-node-card h4 { margin: 0 0 10px 0; }
+
+.formflow-node-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+}
+
+.formflow-tier-marker {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+.formflow-tier-marker .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.formflow-tier-marker.tier-pro { background: #007cba; }
+.formflow-tier-marker.tier-business { background: #e68e00; }
+.formflow-tier-marker.tier-lifetime { background: #9b59b6; }
+
