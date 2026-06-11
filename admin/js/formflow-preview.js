@@ -23,9 +23,23 @@
 
             let formHtml = '<form class="formflow-preview-form" style="width:100%; max-width:28rem; margin:0 auto; background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); border:1px solid #f3f4f6; padding:2rem; box-sizing:border-box; display:flex; flex-direction:column; gap:1.5rem; transition:all 0.5s ease-in-out;" onsubmit="event.preventDefault();">';
             
-            // Separate submit button and input nodes
+            // Separate submit button and input nodes, exclude non-visual nodes
             let submitNodes = nodes.filter(n => n.type === 'submitButton');
-            let inputNodes = nodes.filter(n => n.type !== 'submit' && n.type !== 'submitButton');
+            let inputNodes = nodes.filter(n => {
+                if (n.type === 'submit' || n.type === 'submitButton') return false;
+                
+                // Exclude non-visual nodes (like Validation) if the registry flags them as such
+                if (typeof formflowEditorData !== 'undefined' && 
+                    formflowEditorData.registered_nodes && 
+                    formflowEditorData.registered_nodes[n.type]) {
+                    
+                    let def = formflowEditorData.registered_nodes[n.type];
+                    if (def.hasOwnProperty('is_visual') && !def.is_visual) {
+                        return false;
+                    }
+                }
+                return true;
+            });
 
             // Filter out disconnected nodes (only render nodes that have at least one connection)
             let connectedIds = new Set();
