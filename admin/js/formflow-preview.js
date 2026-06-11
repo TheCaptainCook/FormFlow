@@ -49,6 +49,29 @@
             });
             inputNodes = inputNodes.filter(n => connectedIds.has(n.id));
 
+            // Compute connected validation nodes for HTML attribute injection
+            let nodeValidations = {};
+            nodes.forEach(n => nodeValidations[n.id] = []);
+            
+            edges.forEach(edge => {
+                let fromNode = nodes.find(n => n.id === edge.from);
+                let toNode = nodes.find(n => n.id === edge.to);
+                
+                if (fromNode && toNode) {
+                    let fromDef = (typeof formflowEditorData !== 'undefined' && formflowEditorData.registered_nodes) ? formflowEditorData.registered_nodes[fromNode.type] : null;
+                    let toDef = (typeof formflowEditorData !== 'undefined' && formflowEditorData.registered_nodes) ? formflowEditorData.registered_nodes[toNode.type] : null;
+                    
+                    let fromIsVal = fromDef && fromDef.category === 'validation';
+                    let toIsVal = toDef && toDef.category === 'validation';
+                    
+                    if (fromIsVal && !toIsVal) {
+                        nodeValidations[toNode.id].push(fromNode);
+                    } else if (!fromIsVal && toIsVal) {
+                        nodeValidations[fromNode.id].push(toNode);
+                    }
+                }
+            });
+
             // Topological Sort (Kahn's Algorithm) with Y-coordinate secondary sorting
             let inDegree = {};
             let adjList = {};
@@ -112,41 +135,72 @@
                 let showLabel = node.fieldValues && node.fieldValues.showLabel !== undefined ? node.fieldValues.showLabel : true;
                 if (node.type === 'submitButton') showLabel = false;
                 let placeholder = node.fieldValues && node.fieldValues.placeholder !== undefined && node.fieldValues.placeholder.trim() !== '' ? node.fieldValues.placeholder : `Enter ${label.toLowerCase()}...`;
-                let isRequired = node.fieldValues && node.fieldValues.required ? ' <span style="color:red;">*</span>' : '';
+                
+                let isRequired = node.fieldValues && node.fieldValues.required ? true : false;
+                let validationAttrs = '';
+                
+                let validators = nodeValidations[node.id] || [];
+                validators.forEach(v => {
+                    let v_fv = v.fieldValues || {};
+                    switch (v.type) {
+                        case 'validateRequired':
+                            isRequired = true;
+                            break;
+                        case 'validateMinLength':
+                            if (v_fv.min !== undefined) validationAttrs += ` minlength="${v_fv.min}"`;
+                            break;
+                        case 'validateMaxLength':
+                            if (v_fv.max !== undefined) validationAttrs += ` maxlength="${v_fv.max}"`;
+                            break;
+                        case 'validateMinValue':
+                            if (v_fv.min !== undefined) validationAttrs += ` min="${v_fv.min}"`;
+                            break;
+                        case 'validateMaxValue':
+                            if (v_fv.max !== undefined) validationAttrs += ` max="${v_fv.max}"`;
+                            break;
+                        case 'validateRegex':
+                            if (v_fv.pattern) validationAttrs += ` pattern="${v_fv.pattern}"`;
+                            break;
+                    }
+                });
+
+                let isRequiredHtml = isRequired ? ' <span style="color:red;">*</span>' : '';
+                let requiredAttr = isRequired ? 'required' : '';
+                let combinedAttrs = (requiredAttr + ' ' + validationAttrs).trim();
 
                 // Add staggered entrance animation via CSS classes
                 let delay = index * 100;
                 formHtml += `<div class="formflow-preview-field" style="animation-delay: ${delay}ms">`;
                 
                 if (showLabel) {
-                    formHtml += `<label style="display:block; font-size:0.875rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">${label}${isRequired}</label>`;
+                    formHtml += `<label style="display:block; font-size:0.875rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">${label}${isRequiredHtml}</label>`;
                 }
                 
                 if (node.type === 'textareaField' || node.type === 'textarea') {
                     let rows = node.fieldValues && node.fieldValues.rows !== undefined ? node.fieldValues.rows : 4;
-                    formHtml += `<textarea placeholder="${placeholder}" rows="${rows}" style="${baseInputStyle} resize:vertical;" readonly onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.5)';" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"></textarea>`;
+                    formHtml += `<textarea placeholder="${placeholder}" rows="${rows}" style="${baseInputStyle} resize:vertical;" ${combinedAttrs} readonly onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.5)';" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"></textarea>`;
                 } else if (node.type === 'selectField') {
                     let optionsText = node.fieldValues && node.fieldValues.options !== undefined ? node.fieldValues.options : 'Option 1, Option 2, Option 3';
                     let optionsList = optionsText.split(',').map(s => s.trim()).filter(s => s);
                     let optionsHtml = optionsList.map(opt => `<option>${opt}</option>`).join('');
-                    formHtml += `<select style="${baseInputStyle} appearance:none; cursor:not-allowed;" disabled>${optionsHtml || '<option>Select an option...</option>'}</select>`;
+                    formHtml += `<select style="${baseInputStyle} appearance:none; cursor:not-allowed;" ${combinedAttrs} disabled>${optionsHtml || '<option>Select an option...</option>'}</select>`;
                 } else if (node.type === 'checkboxField') {
                     let checkboxText = node.fieldValues && node.fieldValues.checkboxText !== undefined ? node.fieldValues.checkboxText : 'Check me';
-                    formHtml += `<div style="display:flex; align-items:center; gap:0.75rem;"><input type="checkbox" style="width:1.25rem; height:1.25rem; border-radius:0.25rem; border:1px solid #d1d5db; cursor:not-allowed;" disabled /> <span style="color:#4b5563;">${checkboxText}</span></div>`;
+                    formHtml += `<div style="display:flex; align-items:center; gap:0.75rem;"><input type="checkbox" style="width:1.25rem; height:1.25rem; border-radius:0.25rem; border:1px solid #d1d5db; cursor:not-allowed;" ${combinedAttrs} disabled /> <span style="color:#4b5563;">${checkboxText}</span></div>`;
                 } else if (node.type === 'radioGroup') {
                     let optionsText = node.fieldValues && node.fieldValues.options !== undefined ? node.fieldValues.options : 'Option 1, Option 2';
                     let optionsList = optionsText.split(',').map(s => s.trim()).filter(s => s);
-                    let radiosHtml = optionsList.map(opt => `<div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;"><input type="radio" style="width:1.25rem; height:1.25rem; border:1px solid #d1d5db; cursor:not-allowed;" disabled /> <span style="color:#4b5563;">${opt}</span></div>`).join('');
+                    let radiosHtml = optionsList.map(opt => `<div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;"><input type="radio" style="width:1.25rem; height:1.25rem; border:1px solid #d1d5db; cursor:not-allowed;" ${combinedAttrs} disabled /> <span style="color:#4b5563;">${opt}</span></div>`).join('');
                     formHtml += radiosHtml;
                 } else if (node.type === 'rangeSlider') {
-                    formHtml += `<input type="range" style="width:100%; height:0.5rem; background:#e5e7eb; border-radius:0.5rem; cursor:not-allowed;" disabled />`;
+                    formHtml += `<input type="range" style="width:100%; height:0.5rem; background:#e5e7eb; border-radius:0.5rem; cursor:not-allowed;" ${combinedAttrs} disabled />`;
                 } else if (node.type === 'submitButton') {
                     let btnText = node.fieldValues && node.fieldValues.buttonText !== undefined ? node.fieldValues.buttonText : 'Submit Form';
                     let btnColor = node.fieldValues && node.fieldValues.buttonColor !== undefined ? node.fieldValues.buttonColor : '#2563eb';
                     let txtColor = node.fieldValues && node.fieldValues.textColor !== undefined ? node.fieldValues.textColor : '#ffffff';
                     formHtml += `<button type="button" style="width:100%; display:flex; justify-content:center; padding:0.75rem 1rem; border:none; border-radius:0.5rem; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:0.875rem; font-weight:700; color:${txtColor}; background:${btnColor}; cursor:pointer;">${btnText}</button>`;
                 } else {
-                    formHtml += `<input type="${htmlType}" placeholder="${placeholder}" style="${baseInputStyle}" readonly onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.5)';" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';" />`;
+                    formHtml += `<input type="${htmlType}" placeholder="${placeholder}" style="${baseInputStyle}" ${combinedAttrs} readonly onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.5)';" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';" />`;
                 }
                 
                 formHtml += '</div>';

@@ -73,6 +73,32 @@ if ( count($sorted_inputs) < count($input_nodes) ) {
 
 $inputs = array_merge($sorted_inputs, $submit_nodes);
 $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
+// Compute validations per node from edges
+$node_validations = array();
+foreach ($nodes as $n) {
+    $node_validations[$n['id']] = array();
+}
+
+foreach ($edges as $edge) {
+    $from_node = null;
+    $to_node = null;
+    foreach ($nodes as $n) {
+        if ($n['id'] === $edge['from']) $from_node = $n;
+        if ($n['id'] === $edge['to']) $to_node = $n;
+    }
+    
+    if ($from_node && $to_node) {
+        $from_is_val = isset($registered_nodes[$from_node['type']]) && $registered_nodes[$from_node['type']]['category'] === 'validation';
+        $to_is_val = isset($registered_nodes[$to_node['type']]) && $registered_nodes[$to_node['type']]['category'] === 'validation';
+        
+        if ($from_is_val && ! $to_is_val) {
+            $node_validations[$to_node['id']][] = $from_node;
+        } elseif (! $from_is_val && $to_is_val) {
+            $node_validations[$from_node['id']][] = $to_node;
+        }
+    }
+}
+
 ?>
 
 <div class="formflow-form-container" id="formflow-<?php echo esc_attr( $form_id ); ?>">
@@ -100,8 +126,39 @@ $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
             $showLabel = isset($fv['showLabel']) ? filter_var($fv['showLabel'], FILTER_VALIDATE_BOOLEAN) : true;
             if ($node['type'] === 'submitButton') $showLabel = false;
             $placeholder = isset($fv['placeholder']) && trim($fv['placeholder']) !== '' ? $fv['placeholder'] : 'Enter ' . strtolower($label) . '...';
-            $requiredHtml = !empty($fv['required']) ? ' <span style="color:red;">*</span>' : '';
-            $requiredAttr = !empty($fv['required']) ? 'required' : '';
+            
+            // Check connected validation nodes
+            $validators = isset($node_validations[$node['id']]) ? $node_validations[$node['id']] : array();
+            $isRequired = !empty($fv['required']);
+            $validationAttrs = '';
+            
+            foreach ($validators as $v) {
+                $v_fv = isset($v['fieldValues']) ? $v['fieldValues'] : array();
+                switch ($v['type']) {
+                    case 'validateRequired':
+                        $isRequired = true;
+                        break;
+                    case 'validateMinLength':
+                        if (isset($v_fv['min'])) $validationAttrs .= ' minlength="' . esc_attr($v_fv['min']) . '"';
+                        break;
+                    case 'validateMaxLength':
+                        if (isset($v_fv['max'])) $validationAttrs .= ' maxlength="' . esc_attr($v_fv['max']) . '"';
+                        break;
+                    case 'validateMinValue':
+                        if (isset($v_fv['min'])) $validationAttrs .= ' min="' . esc_attr($v_fv['min']) . '"';
+                        break;
+                    case 'validateMaxValue':
+                        if (isset($v_fv['max'])) $validationAttrs .= ' max="' . esc_attr($v_fv['max']) . '"';
+                        break;
+                    case 'validateRegex':
+                        if (!empty($v_fv['pattern'])) $validationAttrs .= ' pattern="' . esc_attr($v_fv['pattern']) . '"';
+                        break;
+                }
+            }
+
+            $requiredHtml = $isRequired ? ' <span style="color:red;">*</span>' : '';
+            $requiredAttr = $isRequired ? 'required' : '';
+            $combinedAttrs = trim($requiredAttr . ' ' . $validationAttrs);
             $delay = $index * 100;
         ?>
             <div class="formflow-preview-field" style="animation-delay: <?php echo esc_attr($delay); ?>ms">
@@ -111,14 +168,14 @@ $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
 
                 <?php if ($node['type'] === 'textareaField' || $node['type'] === 'textarea') : ?>
                     <?php $rows = isset($fv['rows']) ? intval($fv['rows']) : 4; ?>
-                    <textarea name="<?php echo esc_attr($node['id']); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" rows="<?php echo esc_attr($rows); ?>" class="formflow-input" <?php echo $requiredAttr; ?>></textarea>
+                    <textarea name="<?php echo esc_attr($node['id']); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" rows="<?php echo esc_attr($rows); ?>" class="formflow-input" <?php echo $combinedAttrs; ?>></textarea>
                 
                 <?php elseif ($node['type'] === 'selectField') : ?>
                     <?php 
                         $optionsText = isset($fv['options']) ? $fv['options'] : 'Option 1, Option 2, Option 3';
                         $options = array_filter(array_map('trim', explode(',', $optionsText)));
                     ?>
-                    <select name="<?php echo esc_attr($node['id']); ?>" class="formflow-input" <?php echo $requiredAttr; ?>>
+                    <select name="<?php echo esc_attr($node['id']); ?>" class="formflow-input" <?php echo $combinedAttrs; ?>>
                         <option value=""><?php echo esc_html($placeholder); ?></option>
                         <?php foreach($options as $opt) : ?>
                             <option value="<?php echo esc_attr($opt); ?>"><?php echo esc_html($opt); ?></option>
@@ -128,7 +185,7 @@ $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
                 <?php elseif ($node['type'] === 'checkboxField') : ?>
                     <?php $checkboxText = isset($fv['checkboxText']) ? $fv['checkboxText'] : 'Check me'; ?>
                     <div class="formflow-checkbox-wrapper">
-                        <input type="checkbox" name="<?php echo esc_attr($node['id']); ?>" value="yes" class="formflow-checkbox" <?php echo $requiredAttr; ?> />
+                        <input type="checkbox" name="<?php echo esc_attr($node['id']); ?>" value="yes" class="formflow-checkbox" <?php echo $combinedAttrs; ?> />
                         <span class="formflow-checkbox-text"><?php echo esc_html($checkboxText); ?></span>
                     </div>
 
@@ -140,14 +197,14 @@ $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
                     <div class="formflow-radio-group">
                         <?php foreach($options as $opt) : ?>
                             <label class="formflow-radio-label">
-                                <input type="radio" name="<?php echo esc_attr($node['id']); ?>" value="<?php echo esc_attr($opt); ?>" class="formflow-radio" <?php echo $requiredAttr; ?> />
+                                <input type="radio" name="<?php echo esc_attr($node['id']); ?>" value="<?php echo esc_attr($opt); ?>" class="formflow-radio" <?php echo $combinedAttrs; ?> />
                                 <span><?php echo esc_html($opt); ?></span>
                             </label>
                         <?php endforeach; ?>
                     </div>
 
                 <?php elseif ($node['type'] === 'rangeSlider') : ?>
-                    <input type="range" name="<?php echo esc_attr($node['id']); ?>" class="formflow-range" <?php echo $requiredAttr; ?> />
+                    <input type="range" name="<?php echo esc_attr($node['id']); ?>" class="formflow-range" <?php echo $combinedAttrs; ?> />
 
                 <?php elseif ($node['type'] === 'submitButton') : ?>
                     <?php 
@@ -158,7 +215,7 @@ $nonce = wp_create_nonce( 'formflow_submit_nonce_' . $form_id );
                     <button type="submit" class="formflow-submit-btn" style="background-color: <?php echo esc_attr($btnColor); ?>; color: <?php echo esc_attr($txtColor); ?>;"><?php echo esc_html($btnText); ?></button>
 
                 <?php else : ?>
-                    <input type="<?php echo esc_attr($htmlType); ?>" name="<?php echo esc_attr($node['id']); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" class="formflow-input" <?php echo $requiredAttr; ?> />
+                    <input type="<?php echo esc_attr($htmlType); ?>" name="<?php echo esc_attr($node['id']); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" class="formflow-input" <?php echo $combinedAttrs; ?> />
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
